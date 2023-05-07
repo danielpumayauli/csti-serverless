@@ -49,6 +49,19 @@ functions:
           arn: !GetAtt TargetSQS.Arn
           batchSize: 10
           functionResponseType: "ReportBatchItemFailures"
+  replicatorLambda:
+    handler: src/functions/replicator.handler
+    environment:
+      REPLICAS_TABLE_NAME: !Ref replicasTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: !GetAtt replicasTable.Arn
+    events:
+      - stream:
+          type: dynamodb
+          arn: !GetAtt resultsTable.StreamArn
   readDataLambda:
     handler: src/functions/reader.handler
     environment:

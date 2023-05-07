@@ -4,7 +4,7 @@ import { DynamoDB } from 'aws-sdk';
 const RESULTS_TABLE_NAME = process.env.RESULTS_TABLE_NAME;
 const documentClient = new DynamoDB.DocumentClient({ region: process.env.AWS_REGION });
 
-export const execute = async (event: APIGatewayEvent) => {
+export const handler = async (event: APIGatewayEvent) => {
   const params = {
     TableName : RESULTS_TABLE_NAME as string,
   };
