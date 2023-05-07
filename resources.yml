@@ -1,0 +1,110 @@
+EventBus:
+  Type: AWS::Events::EventBus
+  Properties:
+    Name: CSTI_EVENT_BUS
+
+TargetSQS:
+  Type: AWS::SQS::Queue
+  Properties:
+    QueueName: CSTI_MESSAGE_QUEUE
+    RedrivePolicy:
+      deadLetterTargetArn: !GetAtt TargetDLQ.Arn
+      maxReceiveCount: 1
+
+TargetDLQ:
+  Type: AWS::SQS::Queue
+  Properties:
+    QueueName: CSTI_MESSAGE_DLQ
+
+TargetSQSRule:
+  Type: AWS::Events::Rule
+  Properties:
+    EventBusName: !GetAtt EventBus.Arn
+    EventPattern:
+      source:
+        - "csti-app"
+      detail-type:
+        - "inputs"
+    Targets:
+      - Arn: !GetAtt TargetSQS.Arn
+        Id: csti-event-bus-target-sqs-${sls:stage}
+
+TargetSQSPolicy:
+  Type: AWS::SQS::QueuePolicy
+  Properties:
+    Queues:
+      - !Ref TargetSQS
+    PolicyDocument:
+      Statement:
+        - Effect: "Allow"
+          Action:
+            - "SQS:SendMessage"
+          Resource: !GetAtt TargetSQS.Arn
+          Principal:
+            Service: events.amazonaws.com
+
+inputsTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    BillingMode: PAY_PER_REQUEST
+    AttributeDefinitions:
+      - AttributeName: inputId
+        AttributeType: S
+    KeySchema:
+      - AttributeName: inputId
+        KeyType: HASH
+
+resultsTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    BillingMode: PAY_PER_REQUEST
+    AttributeDefinitions:
+      - AttributeName: resultId
+        AttributeType: S
+    KeySchema:
+      - AttributeName: resultId
+        KeyType: HASH
+
+MyRedisCluster:
+  Type: AWS::ElastiCache::CacheCluster
+  Properties:
+    CacheNodeType: cache.t2.micro
+    Engine: redis
+    NumCacheNodes: 1
+    Port: 6379
+    CacheSubnetGroupName: !Ref MySubnetGroup
+    VpcSecurityGroupIds:
+      - !Ref MyRedisSecurityGroup
+
+MySubnetGroup:
+  Type: AWS::ElastiCache::SubnetGroup
+  Properties:
+    Description: "Subnet group for my Redis cluster"
+    SubnetIds: 
+      - !Ref MySubnets
+
+MySubnets:
+  Type: AWS::EC2::Subnet
+  Properties:
+    VpcId: !Ref MyVpc
+    CidrBlock: "10.0.1.0/24"
+    AvailabilityZone: us-east-1a
+
+MyVpc:
+  Type: AWS::EC2::VPC
+  Properties:
+    CidrBlock: "10.0.0.0/16"
+    Tags:
+      - Key: Name
+        Value: MyVpc
+
+MyRedisSecurityGroup:
+  Type: AWS::EC2::SecurityGroup
+  Properties:
+    GroupDescription: Security group for Redis
+    VpcId: !Ref MyVpc
+    SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 6379
+        ToPort: 6379
+        CidrIp: 0.0.0.0/0
