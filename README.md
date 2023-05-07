@@ -26,7 +26,7 @@ This is a Typescript and Serverless Framework project
 - [POST] https://7m8pz73o88.execute-api.us-east-1.amazonaws.com/dev/generate
 - [GET] https://7m8pz73o88.execute-api.us-east-1.amazonaws.com/dev/find
 
-- En esta aplicación se despliega una aplicación con una arquitectura de comunicación asíncrona basada en eventos,
+- En esta aplicación se despliega una arquitectura de comunicación asíncrona basada en eventos,
 para la producción / consumo de mensajes entre servicios de AWS, se consumen los registros de una base de datos desde el endpoint POST brindado, y estos se envían a un event buss router cumpliendo con una regla definida para la aplicación, estos registros son enviados como mensajes a una cola de mensajería SQS para ser consumidos por un servicio lambda suscrito a ella, que posteriormente cumple con registrarlos en una tabla de DynamoDB, la cola de mensajería tiene vinculada una cola DLQ para los mensajes fallidos.
 El servicio publicador es el que se encarga de ejecutar el algoritmo del juego LCR, cumpliendo con las especificaciones dadas por el juego de dados previamente brindada.
 
