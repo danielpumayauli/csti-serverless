@@ -23,7 +23,6 @@ This is a Typescript and Serverless Framework project
 - `npm run remove` remove stack on your account
 
 ## API information
-- Authorization Bearer is required
 - [POST] https://7m8pz73o88.execute-api.us-east-1.amazonaws.com/dev/generate
 - [GET] https://7m8pz73o88.execute-api.us-east-1.amazonaws.com/dev/find
 
