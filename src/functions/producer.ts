@@ -23,7 +23,6 @@ export const handler = async (event: APIGatewayEvent) => {
 
   for (const { input } of Items) {
     const output = playLCR(input);
-    console.log('Game en el producer:', {input, output});
     Entries.push({
       EventBusName: EVENT_BUS_NAME,
       Detail: JSON.stringify({

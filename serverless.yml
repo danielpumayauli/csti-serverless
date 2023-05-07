@@ -13,75 +13,14 @@ provider:
           Action: events:PutEvents
           Resource: !GetAtt EventBus.Arn
 
-functions:
-  putEventsLambda:
-    handler: src/functions/producer.handler
-    environment:
-      EventBusName: !Ref EventBus
-      INPUTS_TABLE_NAME: !Ref inputsTable
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:Scan
-        Resource: !GetAtt inputsTable.Arn
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-        Resource: !GetAtt inputsTable.Arn
-      - Effect: Allow
-        Action: events:PutEvents
-        Resource: !GetAtt EventBus.Arn
-    events:
-      - http:
-          path: /generate
-          method: post
-  processEventsLambda:
-    handler: src/functions/consumer.handler
-    environment:
-      RESULTS_TABLE_NAME: !Ref resultsTable
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-        Resource: !GetAtt resultsTable.Arn
-    events:
-      - sqs:
-          arn: !GetAtt TargetSQS.Arn
-          batchSize: 10
-          functionResponseType: "ReportBatchItemFailures"
-  replicatorLambda:
-    handler: src/functions/replicator.handler
-    environment:
-      REPLICAS_TABLE_NAME: !Ref replicasTable
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-        Resource: !GetAtt replicasTable.Arn
-    events:
-      - stream:
-          type: dynamodb
-          arn: !GetAtt resultsTable.StreamArn
-  readDataLambda:
-    handler: src/functions/reader.handler
-    environment:
-      RESULTS_TABLE_NAME: !Ref resultsTable
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:Scan
-        Resource: !GetAtt resultsTable.Arn
-    events:
-      - http:
-          method: get
-          path: find
+functions: ${file(serverless/functions.yml)}
 
 plugins:
   - serverless-plugin-typescript
   - serverless-iam-roles-per-function
 
 resources:
- Resources: ${file(resources.yml)} 
+ Resources: ${file(serverless/resources.yml)} 
  Outputs:
     EventBusName:
       Description: "Description for the output"

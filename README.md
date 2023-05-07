@@ -32,6 +32,10 @@ para la producción/consumo de mensajes entre servicios de AWS, el servicio publ
 - Un DynamoDB Stream suscrito a la tabla de resultados enviará en un evento la información de un registro nuevo, posteriormente una lambda hará la réplica de la misma información.
 - El servicio publicador es el que se encarga de ejecutar el algoritmo del juego LCR, cumpliendo con las especificaciones dadas por el juego de dados previamente brindada.
 - Al ejecutar el endpoint POST se estarán publicando 5 mensajes al event buss de mensajería para que estos sean guardados asincronamente en la tabla de resultados de DynamoDB. Los resultados se pueden consultar con el endpoint GET que adjunto a continuación.
+- Opciones de mejora del proyecto:
+  - A nivel de aplicación es posible agregar el servicio de caché de alta velocidad DAX de Dynamo para reducir latencia de consultas.
+  - Crear reglas personalizadas para filtrar el tráfico malicioso con Web Application Firewall para proteger los recursos de la aplicación. 
+  - Utilizar tsoa o jest para agregar los test unitarios a los componentes.
 
 ![GET](https://res.cloudinary.com/dcwq9jz8t/image/upload/v1683477257/dev/csti-serverless_ff2bpt.jpg)
 
