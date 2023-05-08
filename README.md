@@ -23,19 +23,14 @@ This is a Typescript and Serverless Framework project
 - `npm run remove` remove stack on your account
 
 ## API information
-- Authorization Bearer is required
 - [POST] https://7m8pz73o88.execute-api.us-east-1.amazonaws.com/dev/generate
 - [GET] https://7m8pz73o88.execute-api.us-east-1.amazonaws.com/dev/find
 
 - En esta aplicación se despliega una arquitectura de comunicación asíncrona basada en eventos,
 para la producción/consumo de mensajes entre servicios de AWS, el servicio publicador consume los registros de una base de datos desde el endpoint POST brindado, y estos se envían a un event buss router cumpliendo con una regla definida para la aplicación, estos registros son enviados como mensajes a una cola de mensajería SQS para ser consumidos por un servicio lambda suscrito a ella, que posteriormente cumple con registrarlos en una tabla de DynamoDB, la cola de mensajería tiene vinculada una cola DLQ para los mensajes fallidos.
 - Un DynamoDB Stream suscrito a la tabla de resultados enviará en un evento la información de un registro nuevo, posteriormente una lambda hará la réplica de la misma información.
-- El servicio publicador es el que se encarga de ejecutar el algoritmo del juego LCR, cumpliendo con las especificaciones dadas por el juego de dados previamente brindada.
+- El servicio publicador es el que se encarga de ejecutar el algoritmo del juego LCR, cumpliendo con las especificaciones dadas por el juego de dados previamente brindada, que posee una complejidad algorítmica O de NxM, donde N es la cantidad de juegos y M es la cantidad máxima de lanzamientos de dados en cada juego.
 - Al ejecutar el endpoint POST se estarán publicando 5 mensajes al event buss de mensajería para que estos sean guardados asincronamente en la tabla de resultados de DynamoDB. Los resultados se pueden consultar con el endpoint GET que adjunto a continuación.
-- Opciones de mejora del proyecto:
-  - A nivel de aplicación es posible agregar el servicio de caché de alta velocidad DAX de Dynamo para reducir latencia de consultas.
-  - Crear reglas personalizadas para filtrar el tráfico malicioso con Web Application Firewall para proteger los recursos de la aplicación. 
-  - Utilizar tsoa o jest para agregar los test unitarios a los componentes.
 
 ![GET](https://res.cloudinary.com/dcwq9jz8t/image/upload/v1683477257/dev/csti-serverless_ff2bpt.jpg)
 
