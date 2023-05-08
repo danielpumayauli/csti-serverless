@@ -3,6 +3,7 @@ import { APIGatewayEvent } from 'aws-lambda';
 import { DynamoDB } from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { playLCR } from '../utils/game';
+import { EventBridgeEntry } from '../interfaces/producer';
 
 const EVENT_BUS_NAME = process.env.EventBusName;
 const INPUTS_TABLE_NAME = process.env.INPUTS_TABLE_NAME;
@@ -19,12 +20,12 @@ export const handler = async (event: APIGatewayEvent) => {
 
   if (!Items) return;
 
-  const Entries: object[] = [];
+  const Entries: EventBridgeEntry[] = [];
 
   for (const { input } of Items) {
     const output = playLCR(input);
     Entries.push({
-      EventBusName: EVENT_BUS_NAME,
+      EventBusName: EVENT_BUS_NAME as string,
       Detail: JSON.stringify({
         resultId: uuidv4(),
         input,
